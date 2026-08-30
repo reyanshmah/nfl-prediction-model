@@ -1,0 +1,613 @@
+[
+  {
+    "home_team": "SEA",
+    "away_team": "NE",
+    "week": 1,
+    "game_date": "2026-09-09",
+    "model_win_prob": 0.7663,
+    "market_win_prob": 0.6092,
+    "model_margin": 7.03,
+    "market_spread": 3.5,
+    "home_moneyline": -175.0,
+    "away_moneyline": 145.0,
+    "home_starters_out": 0.0,
+    "away_starters_out": 0.0,
+    "home_qb": {
+      "name": "Sam Darnold",
+      "predicted_yards": 218.4
+    },
+    "home_rb": {
+      "name": "Zach Charbonnet",
+      "predicted_yards": 67.9
+    },
+    "home_wr": {
+      "name": "Jaxon Smith-Njigba",
+      "predicted_yards": 81.0
+    },
+    "away_qb": {
+      "name": "Drake Maye",
+      "predicted_yards": 206.1
+    },
+    "away_rb": {
+      "name": "Rhamondre Stevenson",
+      "predicted_yards": 68.0
+    },
+    "away_wr": {
+      "name": "A.J. Brown",
+      "predicted_yards": 74.1
+    }
+  },
+  {
+    "home_team": "LA",
+    "away_team": "SF",
+    "week": 1,
+    "game_date": "2026-09-10",
+    "model_win_prob": 0.6283,
+    "market_win_prob": 0.6225,
+    "model_margin": 4.34,
+    "market_spread": 3.5,
+    "home_moneyline": -185.0,
+    "away_moneyline": 154.0,
+    "home_starters_out": 0.0,
+    "away_starters_out": 0.0,
+    "home_qb": {
+      "name": "Matthew Stafford",
+      "predicted_yards": 255.2
+    },
+    "home_rb": {
+      "name": "Kyren Williams",
+      "predicted_yards": 90.8
+    },
+    "home_wr": {
+      "name": "Puka Nacua",
+      "predicted_yards": 82.3
+    },
+    "away_qb": {
+      "name": "Brock Purdy",
+      "predicted_yards": 240.0
+    },
+    "away_rb": {
+      "name": "Christian McCaffrey",
+      "predicted_yards": 82.3
+    },
+    "away_wr": {
+      "name": "Mike Evans",
+      "predicted_yards": 64.6
+    }
+  },
+  {
+    "home_team": "CAR",
+    "away_team": "CHI",
+    "week": 1,
+    "game_date": "2026-09-13",
+    "model_win_prob": 0.5008,
+    "market_win_prob": 0.4365,
+    "model_margin": 0.27,
+    "market_spread": -2.5,
+    "home_moneyline": 120.0,
+    "away_moneyline": -142.0,
+    "home_starters_out": 0.0,
+    "away_starters_out": 0.0,
+    "home_qb": {
+      "name": "Bryce Young",
+      "predicted_yards": 225.0
+    },
+    "home_rb": {
+      "name": "Chuba Hubbard",
+      "predicted_yards": 78.9
+    },
+    "home_wr": {
+      "name": "Tetairoa McMillan",
+      "predicted_yards": 73.4
+    },
+    "away_qb": {
+      "name": "Caleb Williams",
+      "predicted_yards": 269.3
+    },
+    "away_rb": {
+      "name": "D'Andre Swift",
+      "predicted_yards": 72.7
+    },
+    "away_wr": {
+      "name": "Rome Odunze",
+      "predicted_yards": 57.8
+    }
+  },
+  {
+    "home_team": "CIN",
+    "away_team": "TB",
+    "week": 1,
+    "game_date": "2026-09-13",
+    "model_win_prob": 0.6429,
+    "market_win_prob": 0.6369,
+    "model_margin": 4.71,
+    "market_spread": 3.5,
+    "home_moneyline": -198.0,
+    "away_moneyline": 164.0,
+    "home_starters_out": 0.0,
+    "away_starters_out": 0.0,
+    "home_qb": {
+      "name": "Joe Burrow",
+      "predicted_yards": 262.7
+    },
+    "home_rb": {
+      "name": "Chase Brown",
+      "predicted_yards": 89.6
+    },
+    "home_wr": {
+      "name": "Ja'Marr Chase",
+      "predicted_yards": 84.0
+    },
+    "away_qb": {
+      "name": "Baker Mayfield",
+      "predicted_yards": 242.7
+    },
+    "away_rb": {
+      "name": "Bucky Irving",
+      "predicted_yards": 78.2
+    },
+    "away_wr": {
+      "name": "Emeka Egbuka",
+      "predicted_yards": 61.6
+    }
+  },
+  {
+    "home_team": "DET",
+    "away_team": "NO",
+    "week": 1,
+    "game_date": "2026-09-13",
+    "model_win_prob": 0.5088,
+    "market_win_prob": 0.7221,
+    "model_margin": -0.51,
+    "market_spread": 7.0,
+    "home_moneyline": -305.0,
+    "away_moneyline": 245.0,
+    "home_starters_out": 0.0,
+    "away_starters_out": 0.0,
+    "home_qb": {
+      "name": "Jared Goff",
+      "predicted_yards": 281.9
+    },
+    "home_rb": {
+      "name": "Jahmyr Gibbs",
+      "predicted_yards": 71.8
+    },
+    "home_wr": {
+      "name": "Amon-Ra St. Brown",
+      "predicted_yards": 96.5
+    },
+    "away_qb": {
+      "name": "Tyler Shough",
+      "predicted_yards": 235.0
+    },
+    "away_rb": {
+      "name": "Travis Etienne Jr.",
+      "predicted_yards": 68.7
+    },
+    "away_wr": {
+      "name": "Chris Olave",
+      "predicted_yards": 76.3
+    }
+  },
+  {
+    "home_team": "HOU",
+    "away_team": "BUF",
+    "week": 1,
+    "game_date": "2026-09-13",
+    "model_win_prob": 0.5946,
+    "market_win_prob": 0.4826,
+    "model_margin": 2.09,
+    "market_spread": -1.5,
+    "home_moneyline": -102.0,
+    "away_moneyline": -118.0,
+    "home_starters_out": 0.0,
+    "away_starters_out": 0.0,
+    "home_qb": {
+      "name": "C.J. Stroud",
+      "predicted_yards": 223.7
+    },
+    "home_rb": {
+      "name": "David Montgomery",
+      "predicted_yards": 77.4
+    },
+    "home_wr": {
+      "name": "Nico Collins",
+      "predicted_yards": 76.2
+    },
+    "away_qb": {
+      "name": "Josh Allen",
+      "predicted_yards": 221.2
+    },
+    "away_rb": {
+      "name": "James Cook III",
+      "predicted_yards": 86.8
+    },
+    "away_wr": {
+      "name": "DJ Moore",
+      "predicted_yards": 56.0
+    }
+  },
+  {
+    "home_team": "IND",
+    "away_team": "BAL",
+    "week": 1,
+    "game_date": "2026-09-13",
+    "model_win_prob": 0.3291,
+    "market_win_prob": 0.3836,
+    "model_margin": -3.85,
+    "market_spread": -3.5,
+    "home_moneyline": 150.0,
+    "away_moneyline": -180.0,
+    "home_starters_out": 0.0,
+    "away_starters_out": 0.0,
+    "home_qb": {
+      "name": "Daniel Jones",
+      "predicted_yards": 245.5
+    },
+    "home_rb": {
+      "name": "Jonathan Taylor",
+      "predicted_yards": 79.7
+    },
+    "home_wr": {
+      "name": "Alec Pierce",
+      "predicted_yards": 61.8
+    },
+    "away_qb": {
+      "name": "Lamar Jackson",
+      "predicted_yards": 250.3
+    },
+    "away_rb": {
+      "name": "Derrick Henry",
+      "predicted_yards": 82.6
+    },
+    "away_wr": {
+      "name": "Zay Flowers",
+      "predicted_yards": 73.6
+    }
+  },
+  {
+    "home_team": "JAX",
+    "away_team": "CLE",
+    "week": 1,
+    "game_date": "2026-09-13",
+    "model_win_prob": 0.8256,
+    "market_win_prob": 0.76,
+    "model_margin": 13.03,
+    "market_spread": 7.5,
+    "home_moneyline": -380.0,
+    "away_moneyline": 300.0,
+    "home_starters_out": 0.0,
+    "away_starters_out": 0.0,
+    "home_qb": {
+      "name": "Trevor Lawrence",
+      "predicted_yards": 232.5
+    },
+    "home_rb": {
+      "name": "Bhayshul Tuten",
+      "predicted_yards": null,
+      "note": "no trailing game history found for this player"
+    },
+    "home_wr": {
+      "name": "Brian Thomas Jr.",
+      "predicted_yards": 57.6
+    },
+    "away_qb": {
+      "name": "Deshaun Watson",
+      "predicted_yards": 188.2
+    },
+    "away_rb": {
+      "name": "Quinshon Judkins",
+      "predicted_yards": 58.2
+    },
+    "away_wr": {
+      "name": "Jerry Jeudy",
+      "predicted_yards": 58.4
+    }
+  },
+  {
+    "home_team": "PIT",
+    "away_team": "ATL",
+    "week": 1,
+    "game_date": "2026-09-13",
+    "model_win_prob": 0.5737,
+    "market_win_prob": 0.6092,
+    "model_margin": 3.76,
+    "market_spread": 3.0,
+    "home_moneyline": -175.0,
+    "away_moneyline": 145.0,
+    "home_starters_out": 0.0,
+    "away_starters_out": 0.0,
+    "home_qb": {
+      "name": "Aaron Rodgers",
+      "predicted_yards": 239.6
+    },
+    "home_rb": {
+      "name": "Jaylen Warren",
+      "predicted_yards": 85.2
+    },
+    "home_wr": {
+      "name": "DK Metcalf",
+      "predicted_yards": 64.5
+    },
+    "away_qb": {
+      "name": "Tua Tagovailoa",
+      "predicted_yards": 199.3
+    },
+    "away_rb": {
+      "name": "Bijan Robinson",
+      "predicted_yards": 88.8
+    },
+    "away_wr": {
+      "name": "Drake London",
+      "predicted_yards": 74.0
+    }
+  },
+  {
+    "home_team": "TEN",
+    "away_team": "NYJ",
+    "week": 1,
+    "game_date": "2026-09-13",
+    "model_win_prob": 0.7056,
+    "market_win_prob": 0.5721,
+    "model_margin": 8.22,
+    "market_spread": 3.0,
+    "home_moneyline": -148.0,
+    "away_moneyline": 124.0,
+    "home_starters_out": 0.0,
+    "away_starters_out": 0.0,
+    "home_qb": {
+      "name": "Cam Ward",
+      "predicted_yards": 220.2
+    },
+    "home_rb": {
+      "name": "Tony Pollard",
+      "predicted_yards": 71.5
+    },
+    "home_wr": {
+      "name": "Carnell Tate",
+      "predicted_yards": null,
+      "note": "no trailing game history found for this player"
+    },
+    "away_qb": {
+      "name": "Geno Smith",
+      "predicted_yards": 201.7
+    },
+    "away_rb": {
+      "name": "Breece Hall",
+      "predicted_yards": 75.4
+    },
+    "away_wr": {
+      "name": "Garrett Wilson",
+      "predicted_yards": 62.9
+    }
+  },
+  {
+    "home_team": "LAC",
+    "away_team": "ARI",
+    "week": 1,
+    "game_date": "2026-09-13",
+    "model_win_prob": 0.6445,
+    "market_win_prob": 0.8082,
+    "model_margin": 5.24,
+    "market_spread": 10.5,
+    "home_moneyline": -535.0,
+    "away_moneyline": 400.0,
+    "home_starters_out": 0.0,
+    "away_starters_out": 0.0,
+    "home_qb": {
+      "name": "Justin Herbert",
+      "predicted_yards": 255.5
+    },
+    "home_rb": {
+      "name": "Omarion Hampton",
+      "predicted_yards": 81.5
+    },
+    "home_wr": {
+      "name": "Ladd McConkey",
+      "predicted_yards": 62.4
+    },
+    "away_qb": {
+      "name": "Jacoby Brissett",
+      "predicted_yards": 234.4
+    },
+    "away_rb": {
+      "name": "Jeremiyah Love",
+      "predicted_yards": null,
+      "note": "no trailing game history found for this player"
+    },
+    "away_wr": {
+      "name": "Marvin Harrison Jr.",
+      "predicted_yards": 63.9
+    }
+  },
+  {
+    "home_team": "LV",
+    "away_team": "MIA",
+    "week": 1,
+    "game_date": "2026-09-13",
+    "model_win_prob": 0.3685,
+    "market_win_prob": 0.6369,
+    "model_margin": -2.52,
+    "market_spread": 3.5,
+    "home_moneyline": -198.0,
+    "away_moneyline": 164.0,
+    "home_starters_out": 0.0,
+    "away_starters_out": 0.0,
+    "home_qb": {
+      "name": "Kirk Cousins",
+      "predicted_yards": 223.2
+    },
+    "home_rb": {
+      "name": "Ashton Jeanty",
+      "predicted_yards": 82.4
+    },
+    "home_wr": {
+      "name": "Tre Tucker",
+      "predicted_yards": 54.8
+    },
+    "away_qb": {
+      "name": "Malik Willis",
+      "predicted_yards": 197.3
+    },
+    "away_rb": {
+      "name": "De'Von Achane",
+      "predicted_yards": 86.0
+    },
+    "away_wr": {
+      "name": "Malik Washington",
+      "predicted_yards": 48.2
+    }
+  },
+  {
+    "home_team": "MIN",
+    "away_team": "GB",
+    "week": 1,
+    "game_date": "2026-09-13",
+    "model_win_prob": 0.7281,
+    "market_win_prob": 0.5174,
+    "model_margin": 7.72,
+    "market_spread": 1.5,
+    "home_moneyline": -118.0,
+    "away_moneyline": -102.0,
+    "home_starters_out": 0.0,
+    "away_starters_out": 0.0,
+    "home_qb": {
+      "name": "Kyler Murray",
+      "predicted_yards": 229.4
+    },
+    "home_rb": {
+      "name": "Aaron Jones Sr.",
+      "predicted_yards": 73.7
+    },
+    "home_wr": {
+      "name": "Justin Jefferson",
+      "predicted_yards": 65.0
+    },
+    "away_qb": {
+      "name": "Jordan Love",
+      "predicted_yards": 242.2
+    },
+    "away_rb": {
+      "name": "Josh Jacobs",
+      "predicted_yards": 90.5
+    },
+    "away_wr": {
+      "name": "Christian Watson",
+      "predicted_yards": 65.6
+    }
+  },
+  {
+    "home_team": "PHI",
+    "away_team": "WAS",
+    "week": 1,
+    "game_date": "2026-09-13",
+    "model_win_prob": 0.7311,
+    "market_win_prob": 0.6575,
+    "model_margin": 9.22,
+    "market_spread": 4.5,
+    "home_moneyline": -218.0,
+    "away_moneyline": 180.0,
+    "home_starters_out": 0.0,
+    "away_starters_out": 0.0,
+    "home_qb": {
+      "name": "Jalen Hurts",
+      "predicted_yards": 224.7
+    },
+    "home_rb": {
+      "name": "Saquon Barkley",
+      "predicted_yards": 80.0
+    },
+    "home_wr": {
+      "name": "DeVonta Smith",
+      "predicted_yards": 61.5
+    },
+    "away_qb": {
+      "name": "Jayden Daniels",
+      "predicted_yards": 207.9
+    },
+    "away_rb": {
+      "name": "Jacory Croskey-Merritt",
+      "predicted_yards": 84.7
+    },
+    "away_wr": {
+      "name": "Terry McLaurin",
+      "predicted_yards": 57.5
+    }
+  },
+  {
+    "home_team": "NYG",
+    "away_team": "DAL",
+    "week": 1,
+    "game_date": "2026-09-13",
+    "model_win_prob": 0.6486,
+    "market_win_prob": 0.4279,
+    "model_margin": 5.08,
+    "market_spread": -2.5,
+    "home_moneyline": 124.0,
+    "away_moneyline": -148.0,
+    "home_starters_out": 0.0,
+    "away_starters_out": 0.0,
+    "home_qb": {
+      "name": "Jaxson Dart",
+      "predicted_yards": 234.1
+    },
+    "home_rb": {
+      "name": "Cam Skattebo",
+      "predicted_yards": 81.7
+    },
+    "home_wr": {
+      "name": "Malik Nabers",
+      "predicted_yards": 74.7
+    },
+    "away_qb": {
+      "name": "Dak Prescott",
+      "predicted_yards": 271.3
+    },
+    "away_rb": {
+      "name": "Javonte Williams",
+      "predicted_yards": 75.4
+    },
+    "away_wr": {
+      "name": "CeeDee Lamb",
+      "predicted_yards": 73.7
+    }
+  },
+  {
+    "home_team": "KC",
+    "away_team": "DEN",
+    "week": 1,
+    "game_date": "2026-09-14",
+    "model_win_prob": 0.3691,
+    "market_win_prob": 0.5721,
+    "model_margin": -3.28,
+    "market_spread": 3.0,
+    "home_moneyline": -148.0,
+    "away_moneyline": 124.0,
+    "home_starters_out": 0.0,
+    "away_starters_out": 0.0,
+    "home_qb": {
+      "name": "Patrick Mahomes",
+      "predicted_yards": 232.0
+    },
+    "home_rb": {
+      "name": "Kenneth Walker III",
+      "predicted_yards": 74.7
+    },
+    "home_wr": {
+      "name": "Rashee Rice",
+      "predicted_yards": 71.7
+    },
+    "away_qb": {
+      "name": "Bo Nix",
+      "predicted_yards": 219.2
+    },
+    "away_rb": {
+      "name": "J.K. Dobbins",
+      "predicted_yards": 63.3
+    },
+    "away_wr": {
+      "name": "Courtland Sutton",
+      "predicted_yards": 63.9
+    }
+  }
+]

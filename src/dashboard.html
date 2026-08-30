@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFL Model Predictions</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #171a21;
+    --panel-hover: #1e222c;
+    --border: #2a2f3a;
+    --text: #e8eaed;
+    --text-dim: #9aa2b1;
+    --accent: #4f8cff;
+    --accent-2: #ff8a4f;
+    --good: #35c17a;
+    --bad: #ff5c5c;
+    --warn-bg: #3a2f12;
+    --warn-border: #7a5a1a;
+    --warn-text: #f0c675;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px 16px 64px;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  h1 {
+    font-size: 1.5rem;
+    margin: 0 0 4px;
+  }
+  .subtitle {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+  }
+  .disclaimer {
+    background: var(--warn-bg);
+    border: 1px solid var(--warn-border);
+    color: var(--warn-text);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sort-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .sort-label {
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    margin-right: 2px;
+  }
+  .sort-btn {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .sort-btn:hover { border-color: var(--accent); color: var(--text); }
+  .sort-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 600;
+  }
+  .sort-btn.recommended { border-color: var(--good); color: var(--good); }
+  .sort-btn.recommended.active { background: var(--good); border-color: var(--good); color: #06210f; }
+  .error-banner {
+    background: #3a1414;
+    border: 1px solid #7a2a2a;
+    color: #ffb3b3;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+  }
+  .game-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    transition: border-color 0.15s ease;
+  }
+  .game-card:hover { border-color: #3a4152; }
+  .game-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    cursor: pointer;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .game-row:hover { background: var(--panel-hover); }
+  .matchup {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    min-width: 160px;
+  }
+  .matchup .at { color: var(--text-dim); font-weight: 400; font-size: 0.85rem; }
+  .game-meta {
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    min-width: 90px;
+  }
+  .prob-pair {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    font-size: 0.85rem;
+  }
+  .prob-pair .pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 84px;
+  }
+  .pill .label { color: var(--text-dim); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  .pill .value { font-size: 0.95rem; font-weight: 700; margin-top: 2px; white-space: nowrap; }
+  .pill.model .value { color: var(--accent); }
+  .pill.market .value { color: var(--accent-2); }
+  .chevron {
+    color: var(--text-dim);
+    transition: transform 0.15s ease;
+    font-size: 0.8rem;
+  }
+  .game-card.expanded .chevron { transform: rotate(90deg); }
+
+  .detail {
+    display: none;
+    padding: 4px 18px 20px;
+    border-top: 1px solid var(--border);
+  }
+  .game-card.expanded .detail { display: block; }
+
+  .detail-section {
+    margin-top: 16px;
+  }
+  .detail-section h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-dim);
+    margin: 0 0 10px;
+  }
+  .compare-row {
+    display: flex;
+    gap: 16px;
+  }
+  .compare-box {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    text-align: center;
+  }
+  .compare-box .big {
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+  .compare-box .small-label {
+    color: var(--text-dim);
+    font-size: 0.75rem;
+    margin-top: 2px;
+  }
+  .bar-track {
+    height: 8px;
+    background: #262b36;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 8px;
+    display: flex;
+  }
+  .bar-fill { height: 100%; }
+
+  .players-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .team-col h4 {
+    margin: 0 0 8px;
+    font-size: 0.95rem;
+  }
+  .player-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--border);
+    font-size: 0.88rem;
+    gap: 10px;
+  }
+  .player-line:last-child { border-bottom: none; }
+  .player-line .pos-tag {
+    color: var(--text-dim);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    margin-right: 6px;
+  }
+  .player-line .yards {
+    font-weight: 600;
+    color: var(--accent);
+    white-space: nowrap;
+    padding-top: 1px;
+  }
+  .player-line .yards.na { color: var(--text-dim); font-weight: 400; font-style: italic; white-space: normal; text-align: right; max-width: 140px; }
+  .ou-line {
+    font-size: 0.76rem;
+    color: var(--text-dim);
+    margin-top: 3px;
+  }
+  .ou-line b { font-weight: 700; }
+  .ou-line.safe b { color: var(--good); }
+  .ou-line.risky b { color: #f0b93a; }
+  .ou-line.most-risky b { color: var(--bad); }
+  .ou-conf { color: var(--text-dim); font-size: 0.7rem; }
+  .ou-methodology {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+  .ou-methodology code {
+    background: var(--panel-hover);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 0.72rem;
+  }
+  .starters-out-row {
+    display: flex;
+    gap: 24px;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+  .starters-out-row b { color: var(--text); }
+
+  @media (max-width: 560px) {
+    .players-grid { grid-template-columns: 1fr; }
+    .prob-pair { gap: 10px; }
+    .game-row { padding: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>NFL Model Predictions</h1>
+  <div class="subtitle" id="subtitle">Loading current_week_predictions.json&hellip;</div>
+  <div id="disclaimer-slot"></div>
+  <div id="error-slot"></div>
+  <div class="sort-bar" id="sort-bar" style="display:none;">
+    <span class="sort-label">Sort by:</span>
+    <button class="sort-btn active" id="sort-btn-date" onclick="setSort('date')">Date</button>
+    <button class="sort-btn" id="sort-btn-confidence" onclick="setSort('confidence')">Model Confidence</button>
+    <button class="sort-btn" id="sort-btn-market-confidence" onclick="setSort('market-confidence')">Market Confidence</button>
+    <button class="sort-btn" id="sort-btn-agreement" onclick="setSort('agreement')">Highest Agreement</button>
+    <button class="sort-btn" id="sort-btn-disagreement" onclick="setSort('disagreement')">Highest Disagreement</button>
+    <button class="sort-btn" id="sort-btn-value" onclick="setSort('value')">Best Value (EV)</button>
+    <button class="sort-btn" id="sort-btn-hidden-edge" onclick="setSort('hidden-edge')">Hidden Edge</button>
+    <button class="sort-btn" id="sort-btn-smart-value" onclick="setSort('smart-value')">Smart Value</button>
+    <button class="sort-btn recommended" id="sort-btn-combined" onclick="setSort('combined')">Combined (Model+Market) &#9733;</button>
+  </div>
+  <div class="ou-methodology" id="value-methodology" style="display:none;">
+    "Highest Agreement" and "Best Value" answer different questions. Agreement tells you which game
+    both sources are confident about &mdash; but a game everyone loves has a terrible payout (a huge
+    favorite might be priced at &minus;900), so being right doesn't mean the bet is profitable. Value
+    is expected value per $1 staked: <code>EV = p &times; b &minus; (1 &minus; p)</code>, where
+    <code>p</code> is the model's own win probability for a side and <code>b</code> is that side's
+    real moneyline payout (e.g. +150 &rarr; b=1.5, &minus;175 &rarr; b=0.571). A positive EV means the
+    model thinks that side is MORE likely to win than the market's own price implies &mdash; an edge,
+    not just a likely outcome. This is a real bet on the model actually beating the market's pricing,
+    which earlier testing in this project found the market usually wins on average &mdash; treat this
+    as "where the model disagrees with the market's price," not a guarantee. Note this often surfaces
+    the SAME games as "Highest Disagreement," since a big model/market probability gap is what
+    produces a big EV number &mdash; see "Hidden Edge" for a more conservative alternative.
+  </div>
+  <div class="ou-methodology" id="hidden-edge-methodology" style="display:none;">
+    A more conservative kind of "value" than raw EV. Best Value (EV) often rewards games where the
+    model confidently overrides a market that ALSO has a strong opinion &mdash; and earlier testing in
+    this project found the market wins more often specifically in those high-disagreement spots (11 of
+    15 in one head-to-head check). Hidden Edge looks for something different: games where the
+    <b>market has no strong opinion</b> (close to a coin flip) but the <b>model is still confident</b>
+    on one side. That's the model adding information in a genuine toss-up, not claiming to know better
+    than a market that's already made up its mind &mdash; arguably the more trustworthy shape of edge,
+    even though it won't always be the highest raw EV number on the board.
+  </div>
+  <div class="ou-methodology" id="smart-value-methodology" style="display:none;">
+    Best Value (EV) and Hidden Edge each answer half the "would this bet be good" question on their
+    own: EV checks whether a bet is profitable at the price offered, but its biggest numbers mostly
+    come from the model fighting a market that's already confident &mdash; the exact spot this
+    project's own testing found the model loses more often. Hidden Edge avoids that trap but never
+    checks whether the bet is actually profitable at the odds given. Smart Value combines both by
+    <i>multiplying</i> them: <code>score = EV &times; (1 &minus; marketConfidence)</code> &mdash; EV
+    is the reasoning AND the profit measure at once, discounted by market confidence. See "Combined
+    (Model+Market)" for a different way of combining them, where the reasoning and the payout are
+    kept as two separate things instead of one multiplied score.
+  </div>
+  <div class="ou-methodology" id="combined-methodology" style="display:none;">
+    <b style="color:var(--good);">If you were actually going to bet on one of these games, this is
+    the sort to use.</b> The others above answer a betting-theory question (is this bet
+    mathematically +EV); this one answers a more direct question: given both the model's AND the
+    market's opinions together, how confident should you actually be, and what would you get back?
+    The model and market probabilities are blended into <b>one combined probability</b> &mdash; not
+    multiplied with the payout, just used as the reasoning &mdash; and the market's real moneyline is
+    shown separately afterward purely as payout info.
+    <br><br>
+    The blend weight is <i>dynamic</i>, not fixed: the market's weight never drops below 50% (it's
+    the generally sharper source overall &mdash; about 2-3 points more accurate in this project's own
+    testing), rising toward 100% as the market gets more confident. The model only gets real influence
+    specifically when the market has no strong opinion. <code>modelWeight = 0.5 &times; (1 &minus;
+    marketConfidence)</code>. So market 50% / model 80% blends meaningfully toward the model (nothing
+    confident to defer to); market 80% / model 65% stays close to the market's own number (overriding
+    a confident market is the model's known weak spot).
+  </div>
+  <div id="games"></div>
+</div>
+
+<script>
+const DATA_PATH = "../data/processed/current_week_predictions.json";
+
+// Over/under lines: predicted_yards adjusted by an empirically-derived gap
+// per position, NOT a plain standard-deviation/normal-distribution formula.
+// Why: yardage is bounded at 0 and right-skewed, so a symmetric std-based
+// cutoff badly overstates real-world safety margins for RB/WR (checked
+// against actual historical data -- a "90%-confidence" std cutoff for WR
+// receiving yards came out negative, which is meaningless).
+//
+// Instead, for each position we took the real historical distribution of
+// actual yardage (qb_passing_features.csv / rb_rushing_features.csv /
+// wr_receiving_features.csv, all seasons) and measured how far the true
+// 20th/80th percentile sits below/above the position's mean. That gap is
+// applied to each player's own predicted_yards:
+//   over_line  = predicted_yards - gapLow   (player has cleared this ~80% of
+//                the time a typical player at this position has, historically)
+//   under_line = predicted_yards + gapHigh
+// OU_CONFIDENCE is the empirical hit rate this is calibrated to. Regenerate
+// these three numbers any time the *_features.csv files are rebuilt.
+// Three confidence tiers, same method at each, just a looser percentile cut
+// for the riskier ones. All three sets of gaps are pre-computed the same
+// way -- regenerate all of them together if the *_features.csv files change.
+//
+// One real wrinkle at the loosest (55%) tier: rushing/receiving yardage is
+// right-skewed enough that its mean sits *above* its own median (a handful
+// of huge games pull the average up) -- so the raw 55th-percentile "under"
+// gap for RB/WR actually came out negative (i.e. "under the prediction" is
+// already better than even odds for those positions before you loosen
+// anything). MIN_GAP floors every gap at a small positive margin so no line
+// ever collapses onto the prediction itself.
+const MIN_GAP = 2;
+const OU_TIERS = {
+  safe:      { label: "Safe",       confidence: 0.80, gaps: {
+    QB: { gapLow: 61.45, gapHigh: 59.55 }, // qb_passing_features.csv, n=2209, mean=229.45
+    RB: { gapLow: 32.64, gapHigh: 30.36 }, // rb_rushing_features.csv, n=1286, mean=71.64
+    WR: { gapLow: 33.13, gapHigh: 29.87 }, // wr_receiving_features.csv, n=4638, mean=54.13
+  }},
+  risky:     { label: "Risky",      confidence: 0.65, gaps: {
+    QB: { gapLow: 29.45, gapHigh: 25.55 },
+    RB: { gapLow: 18.64, gapHigh: 8.36 },
+    WR: { gapLow: 20.13, gapHigh: 7.87 },
+  }},
+  mostRisky: { label: "Most Risky", confidence: 0.55, gaps: {
+    QB: { gapLow: 10.85, gapHigh: 6.55 },
+    RB: { gapLow: 10.64, gapHigh: -1.64 }, // see MIN_GAP note above
+    WR: { gapLow: 11.13, gapHigh: -2.13 }, // see MIN_GAP note above
+  }},
+};
+
+function tierLines(posKey, predictedYards, tierKey) {
+  const gaps = OU_TIERS[tierKey].gaps[posKey];
+  if (!gaps || typeof predictedYards !== "number") return null;
+  const gapLow = Math.max(MIN_GAP, gaps.gapLow);
+  const gapHigh = Math.max(MIN_GAP, gaps.gapHigh);
+  const over = Math.max(0, Math.round((predictedYards - gapLow) * 2) / 2);
+  const under = Math.round((predictedYards + gapHigh) * 2) / 2;
+  return { over, under, gapLow, gapHigh };
+}
+
+// The single "Most Risky" call: whichever side (over/under) has the smaller
+// gap at that tier wins, since a smaller gap means less distance pushed
+// from the raw prediction -- the more aggressive of the two, which is what
+// "most risky" is asking for. Ties (or a missing side) default to Over.
+function bestRiskyPick(posKey, predictedYards) {
+  const lines = tierLines(posKey, predictedYards, "mostRisky");
+  if (!lines) return null;
+  const side = lines.gapHigh < lines.gapLow ? "under" : "over";
+  return { side, value: side === "under" ? lines.under : lines.over };
+}
+
+function pct(x) {
+  if (x === null || x === undefined || isNaN(x)) return "—";
+  return (x * 100).toFixed(1) + "%";
+}
+
+function num(x, digits, suffix) {
+  if (x === null || x === undefined || isNaN(x)) return "—";
+  const sign = x > 0 ? "+" : "";
+  return sign + x.toFixed(digits === undefined ? 1 : digits) + (suffix || "");
+}
+
+function fmtDate(dateStr) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr + "T00:00:00");
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+}
+
+function playerLine(posLabel, posKey, player) {
+  const name = (player && player.name) ? player.name : "Unknown";
+  const predicted = player && typeof player.predicted_yards === "number" ? player.predicted_yards : null;
+
+  if (predicted === null) {
+    const note = player && player.note ? player.note : "no prediction";
+    return `<div class="player-line">
+      <div><span class="pos-tag">${posLabel}</span>${name}</div>
+      <span class="yards na">${note}</span>
+    </div>`;
+  }
+
+  const safe = tierLines(posKey, predicted, "safe");
+  const risky = tierLines(posKey, predicted, "risky");
+  const mostRisky = bestRiskyPick(posKey, predicted);
+
+  const safeHtml = safe
+    ? `<div class="ou-line safe">Safe: Over <b>${safe.over}</b> &middot; Under <b>${safe.under}</b> <span class="ou-conf">(~80%)</span></div>`
+    : "";
+  const riskyHtml = risky
+    ? `<div class="ou-line risky">Risky: Over <b>${risky.over}</b> &middot; Under <b>${risky.under}</b> <span class="ou-conf">(~65%)</span></div>`
+    : "";
+  const mostRiskyHtml = mostRisky
+    ? `<div class="ou-line most-risky">Most Risky: <b>${mostRisky.side === "over" ? "Over" : "Under"} ${mostRisky.value}</b> <span class="ou-conf">(~55%)</span></div>`
+    : "";
+
+  return `<div class="player-line">
+    <div>
+      <div><span class="pos-tag">${posLabel}</span>${name}</div>
+      ${safeHtml}
+      ${riskyHtml}
+      ${mostRiskyHtml}
+    </div>
+    <span class="yards">${predicted.toFixed(1)} yds</span>
+  </div>`;
+}
+
+// A single bar split into a home segment and an away segment, with each
+// team's name and percentage labeled directly on it -- and the leading
+// team bolded -- so who's favored is obvious without reading a caption.
+function splitProbBar(homeTeam, awayTeam, homeProb) {
+  if (homeProb === null || homeProb === undefined || isNaN(homeProb)) {
+    return `<div style="font-size:0.8rem; color:var(--text-dim);">No probability available</div>`;
+  }
+  const h = Math.max(0, Math.min(1, homeProb));
+  const a = 1 - h;
+  const homeLeads = h >= 0.5;
+  const homeStyle = homeLeads ? "font-weight:700; color:var(--text);" : "font-weight:400; color:var(--text-dim);";
+  const awayStyle = !homeLeads ? "font-weight:700; color:var(--text);" : "font-weight:400; color:var(--text-dim);";
+  return `
+    <div style="display:flex; justify-content:space-between; font-size:0.9rem; margin-bottom:4px;">
+      <span style="${homeStyle}">${homeTeam} ${pct(h)}${homeLeads ? " &#9679;" : ""}</span>
+      <span style="${awayStyle}">${homeLeads ? "" : "&#9679; "}${awayTeam} ${pct(a)}</span>
+    </div>
+    <div class="bar-track" style="display:flex;">
+      <div class="bar-fill" style="width:${h * 100}%; background:var(--accent);"></div>
+      <div class="bar-fill" style="width:${a * 100}%; background:var(--accent-2);"></div>
+    </div>`;
+}
+
+function winBar(game) {
+  return `
+    <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-dim); margin-bottom:4px;">Model</div>
+    ${splitProbBar(game.home_team, game.away_team, game.model_win_prob)}
+    <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-dim); margin:12px 0 4px;">Market</div>
+    ${splitProbBar(game.home_team, game.away_team, game.market_win_prob)}`;
+}
+
+// For the collapsed list row: which team each source favors, and by how
+// much -- e.g. "SEA 76.6%" -- rather than a generic home-team-only percentage.
+function favoredPill(homeTeam, awayTeam, prob) {
+  if (prob === null || prob === undefined || isNaN(prob)) return "—";
+  const homeLeads = prob >= 0.5;
+  const team = homeLeads ? homeTeam : awayTeam;
+  const p = homeLeads ? prob : 1 - prob;
+  return `${team} ${pct(p)}`;
+}
+
+// How confident the model is that it has the winner right, regardless of
+// which team it picked -- distance of model_win_prob from a coin flip (0.5).
+// Null/missing predictions sort last (via a sentinel below 0).
+function modelConfidence(game) {
+  const p = game.model_win_prob;
+  if (p === null || p === undefined || isNaN(p)) return -1;
+  return Math.abs(p - 0.5) * 2; // 0 = coin flip, 1 = certain
+}
+
+// Same idea, for the betting market's own implied probability.
+function marketConfidence(game) {
+  const p = game.market_win_prob;
+  if (p === null || p === undefined || isNaN(p)) return -1;
+  return Math.abs(p - 0.5) * 2;
+}
+
+// How far apart the model's and market's win probabilities are -- small
+// diff = they agree on this game, large diff = they don't. Null when either
+// side is missing (both "agreement" and "disagreement" sorts push these to
+// the end, since we can't measure agreement without both numbers).
+function probDiff(game) {
+  const m = game.model_win_prob;
+  const k = game.market_win_prob;
+  if (m === null || m === undefined || isNaN(m) || k === null || k === undefined || isNaN(k)) return null;
+  return Math.abs(m - k);
+}
+
+// "Agreement" = both the model AND the market are strongly, concordantly
+// behind the SAME team -- not just two numbers that happen to be close
+// together (e.g. model 51% / market 53% are "close" but both are near-coin-
+// flips, not a shared conviction). If they favor different teams at all,
+// that's not agreement regardless of how small the raw gap is -- null (sorts
+// last). If they favor the same team, the score is the WEAKER of the two
+// confidences -- the bottleneck that determines how much you can trust this
+// as a "both sides agree this is a lock" game.
+function lockScore(game) {
+  const m = game.model_win_prob;
+  const k = game.market_win_prob;
+  if (m === null || m === undefined || isNaN(m) || k === null || k === undefined || isNaN(k)) return null;
+  const modelFavorsHome = m >= 0.5;
+  const marketFavorsHome = k >= 0.5;
+  if (modelFavorsHome !== marketFavorsHome) return null; // disagree on WHICH team -- not a lock
+  const modelConf = modelFavorsHome ? m : 1 - m;
+  const marketConf = marketFavorsHome ? k : 1 - k;
+  return Math.min(modelConf, marketConf);
+}
+
+// American moneyline -> profit per $1 staked if it wins (e.g. +150 -> 1.5,
+// -175 -> 0.5714).
+function moneylineToPayout(ml) {
+  if (ml === null || ml === undefined || isNaN(ml)) return null;
+  return ml > 0 ? ml / 100 : 100 / Math.abs(ml);
+}
+
+// Expected value per $1 staked, given the model's true win probability p and
+// a payout b (profit per $1 if it wins): win b with probability p, lose the
+// $1 stake with probability (1-p). This is the actual question "would this
+// bet make money", which "Highest Agreement" deliberately does NOT answer --
+// a game both sources love is often a bad bet precisely BECAUSE it's heavily
+// favored, so the payout is tiny (e.g. -900) even though it's likely to hit.
+// A model with a genuine edge over the market shows up here as: model
+// thinks a side is MORE likely than the market's own price implies.
+function expectedValue(p, b) {
+  if (p === null || p === undefined || isNaN(p) || b === null) return null;
+  return p * b - (1 - p);
+}
+
+// Best of the two possible bets on this game (home moneyline vs. away
+// moneyline), using the model's own win probability for each side. Returns
+// null if moneylines or the model probability aren't available.
+function bestValueBet(game) {
+  const p = game.model_win_prob;
+  const bHome = moneylineToPayout(game.home_moneyline);
+  const bAway = moneylineToPayout(game.away_moneyline);
+  if (p === null || p === undefined || isNaN(p) || bHome === null || bAway === null) return null;
+
+  const evHome = expectedValue(p, bHome);
+  const evAway = expectedValue(1 - p, bAway);
+  return evHome >= evAway
+    ? { side: "home", team: game.home_team, moneyline: game.home_moneyline, ev: evHome }
+    : { side: "away", team: game.away_team, moneyline: game.away_moneyline, ev: evAway };
+}
+
+// A different, more conservative notion of "value" than raw EV: games where
+// the MARKET has no strong opinion (near a coin flip) but the MODEL is
+// confident on one side -- the model adding information in a spot the
+// market hasn't committed to, rather than confidently overriding a market
+// that already has a strong view. That second case (high EV, low
+// agreement) is exactly where earlier testing in this project found the
+// market wins more often (11 of 15 in a head-to-head disagreement check),
+// so it's worth treating as a distinct, more trustworthy category, not
+// just a special case of EV.
+// Score = modelConfidence * (1 - marketConfidence): maximized when the
+// model is very sure AND the market is not, and pulled toward 0 if the
+// market is also confident (regardless of which side), even if the model's
+// own confidence is high.
+function hiddenEdgeScore(game) {
+  const mc = modelConfidence(game);
+  const kc = marketConfidence(game);
+  if (mc < 0 || kc < 0) return -1;
+  return mc * (1 - kc);
+}
+
+// The actual answer to "which sort should I bet from": raw EV rewards big
+// payouts, but the biggest EV numbers mostly come from the model
+// confidently overriding a market that's ALSO confident -- precisely the
+// situation this project's own testing showed the model loses more often
+// (11 of 15 in a head-to-head disagreement check). Hidden Edge avoids that
+// failure mode but never checks whether the bet is actually profitable at
+// the price offered. This combines both: real, positive EV, discounted by
+// how confident the market already is -- so a genuinely good bet in a
+// market that hasn't committed keeps its full value, while an EV number
+// that only exists because the model is fighting a confident market gets
+// shrunk down. Null propagates from bestValueBet (missing odds/probability).
+function smartValueScore(game) {
+  const best = bestValueBet(game);
+  if (best === null) return null;
+  const kc = marketConfidence(game);
+  if (kc < 0) return null;
+  return best.ev * (1 - kc);
+}
+
+// Model + market combined into ONE probability -- the "reasoning" -- with
+// the market's own moneyline shown separately afterward purely as payout
+// info, not folded into the score itself (unlike Smart Value, which
+// multiplies EV and market-confidence together).
+//
+// The blend weight is dynamic, not fixed: the market's own weight never
+// drops below 50% (it's the generally sharper source), rising toward 100%
+// as the market gets more confident. The model only gets meaningful say
+// specifically when the market has no strong opinion -- e.g. market 50% /
+// model 80% blends toward the model's view because there's nothing
+// confident to defer to; market 80% / model 65% stays close to the
+// market's number because overriding a confident market is exactly where
+// this project's own testing found the model loses more often.
+function combinedProbability(game) {
+  const p = game.model_win_prob;
+  const mk = game.market_win_prob;
+  if (p === null || p === undefined || isNaN(p) || mk === null || mk === undefined || isNaN(mk)) return null;
+  const marketConf = marketConfidence(game); // 0 (coin flip) .. 1 (certain)
+  const modelWeight = 0.5 * (1 - marketConf); // 0 .. 0.5, market always >= 50%
+  const marketWeight = 1 - modelWeight;
+  const combined = modelWeight * p + marketWeight * mk; // still a home-team probability
+  const side = combined >= 0.5 ? "home" : "away";
+  return {
+    side,
+    team: side === "home" ? game.home_team : game.away_team,
+    confidence: side === "home" ? combined : 1 - combined,
+    moneyline: side === "home" ? game.home_moneyline : game.away_moneyline,
+    modelWeight,
+  };
+}
+
+// The metadata badge shown on the collapsed row adapts to whatever sort is
+// active, so the ordering the user picked is visibly justified rather than
+// always showing the same (possibly unrelated) number.
+function sortMetricBadge(game) {
+  const diff = probDiff(game);
+  switch (currentSort) {
+    case "confidence": {
+      const c = modelConfidence(game);
+      return c >= 0 ? `Model confidence: ${pct(c)}` : null;
+    }
+    case "market-confidence": {
+      const c = marketConfidence(game);
+      return c >= 0 ? `Market confidence: ${pct(c)}` : null;
+    }
+    case "agreement": {
+      const score = lockScore(game);
+      if (score === null) return null;
+      const team = game.model_win_prob >= 0.5 ? game.home_team : game.away_team;
+      return `Both favor ${team} &mdash; weakest side: ${pct(score)}`;
+    }
+    case "disagreement":
+      return diff !== null ? `Model/market differ by ${pct(diff)}` : null;
+    case "value": {
+      const best = bestValueBet(game);
+      if (best === null) return null;
+      const evPct = (best.ev * 100).toFixed(1);
+      const sign = best.ev >= 0 ? "+" : "";
+      return `Best bet: ${best.team} (${best.moneyline > 0 ? "+" : ""}${best.moneyline}) &mdash; model EV ${sign}${evPct}%`;
+    }
+    case "hidden-edge": {
+      const mc = modelConfidence(game);
+      const kc = marketConfidence(game);
+      if (mc < 0 || kc < 0) return null;
+      const team = game.model_win_prob >= 0.5 ? game.home_team : game.away_team;
+      return `Model likes ${team} (${pct(mc)} conf.) &mdash; market is only ${pct(kc)} sure`;
+    }
+    case "smart-value": {
+      const best = bestValueBet(game);
+      const score = smartValueScore(game);
+      if (best === null || score === null) return null;
+      const sign = score >= 0 ? "+" : "";
+      return `Best bet: ${best.team} (${best.moneyline > 0 ? "+" : ""}${best.moneyline}) &mdash; trust-weighted EV ${sign}${(score * 100).toFixed(1)}%`;
+    }
+    case "combined": {
+      const c = combinedProbability(game);
+      if (c === null) return null;
+      const mlStr = c.moneyline > 0 ? `+${c.moneyline}` : `${c.moneyline}`;
+      return `${c.team} ${pct(c.confidence)} combined &mdash; payout at ${mlStr}`;
+    }
+    default:
+      return null;
+  }
+}
+
+function gameCardHTML(game, idx) {
+  const homeWin = game.model_win_prob;
+  const marketWin = game.market_win_prob;
+  const metricBadge = sortMetricBadge(game);
+
+  const detail = `
+    <div class="detail">
+      <div class="detail-section">
+        <h3>Win Probability: Model vs. Market</h3>
+        ${winBar(game)}
+      </div>
+
+      <div class="detail-section">
+        <h3>Predicted Margin vs. Market Spread</h3>
+        <div class="compare-row">
+          <div class="compare-box">
+            <div class="big">${num(game.model_margin, 1, " pts")}</div>
+            <div class="small-label">Model margin (${game.home_team} perspective)</div>
+          </div>
+          <div class="compare-box">
+            <div class="big">${num(game.market_spread, 1, " pts")}</div>
+            <div class="small-label">Market spread_line (${game.home_team} favored if positive)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h3>Starters Listed Out (Injury Report)</h3>
+        <div class="starters-out-row">
+          <span>${game.home_team}: <b>${game.home_starters_out ?? "—"}</b></span>
+          <span>${game.away_team}: <b>${game.away_starters_out ?? "—"}</b></span>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h3>Projected Starters</h3>
+        <div class="ou-methodology">
+          Over/under lines use each position's real historical yardage distribution (not a plain
+          standard-deviation/normal-curve formula &mdash; that badly overstates safety margins for
+          skewed, zero-bounded stats like rushing/receiving yards). For each player: <code>over = predicted
+          &minus; (position mean &minus; position Nth percentile)</code>, <code>under = predicted +
+          (position (100&minus;N)th percentile &minus; position mean)</code> &mdash; the gap real players at
+          that position have historically cleared, centered on this player's own projection. Three tiers,
+          looser percentile cuts = bigger numbers but lower historical hit rate:
+          <span style="color:var(--good); font-weight:600;">Safe (~80%)</span> shows both sides;
+          <span style="color:#f0b93a; font-weight:600;">Risky (~65%)</span> shows both sides, closer to the
+          prediction; <span style="color:var(--bad); font-weight:600;">Most Risky (~55%)</span> shows only
+          whichever single side (over or under) has the smaller gap at that tier.
+        </div>
+        <div class="players-grid">
+          <div class="team-col">
+            <h4>${game.home_team} (Home)</h4>
+            ${playerLine("QB", "QB", game.home_qb)}
+            ${playerLine("RB", "RB", game.home_rb)}
+            ${playerLine("WR1", "WR", game.home_wr)}
+          </div>
+          <div class="team-col">
+            <h4>${game.away_team} (Away)</h4>
+            ${playerLine("QB", "QB", game.away_qb)}
+            ${playerLine("RB", "RB", game.away_rb)}
+            ${playerLine("WR1", "WR", game.away_wr)}
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  return `
+    <div class="game-card" id="card-${idx}">
+      <div class="game-row" onclick="toggleCard(${idx})">
+        <div>
+          <div class="matchup">${game.away_team} <span class="at">@</span> ${game.home_team}</div>
+          <div class="game-meta">${fmtDate(game.game_date)} &middot; Week ${game.week ?? ""}${metricBadge ? ` &middot; ${metricBadge}` : ""}</div>
+        </div>
+        <div class="prob-pair">
+          <div class="pill model">
+            <span class="label">Model</span>
+            <span class="value">${favoredPill(game.home_team, game.away_team, homeWin)}</span>
+          </div>
+          <div class="pill market">
+            <span class="label">Market</span>
+            <span class="value">${favoredPill(game.home_team, game.away_team, marketWin)}</span>
+          </div>
+          <span class="chevron">&#9656;</span>
+        </div>
+      </div>
+      ${detail}
+    </div>`;
+}
+
+function toggleCard(idx) {
+  const card = document.getElementById("card-" + idx);
+  card.classList.toggle("expanded");
+}
+
+let allGames = [];
+let currentSort = "date";
+
+// Sort helper for probDiff-based modes: games missing either probability
+// (probDiff === null) always sort to the bottom, regardless of direction,
+// since "most agreement" / "most disagreement" are both meaningless without
+// both numbers.
+function compareByDiff(a, b, ascending) {
+  const da = probDiff(a);
+  const db = probDiff(b);
+  if (da === null && db === null) return 0;
+  if (da === null) return 1;
+  if (db === null) return -1;
+  return ascending ? da - db : db - da;
+}
+
+function sortedGames() {
+  const games = allGames.slice();
+  switch (currentSort) {
+    case "confidence":
+      games.sort((a, b) => modelConfidence(b) - modelConfidence(a));
+      break;
+    case "market-confidence":
+      games.sort((a, b) => marketConfidence(b) - marketConfidence(a));
+      break;
+    case "agreement": {
+      // Highest "lock" score first; games where they disagree on WHICH team
+      // (lockScore === null) always sort last, regardless of raw prob gap.
+      games.sort((a, b) => {
+        const sa = lockScore(a);
+        const sb = lockScore(b);
+        if (sa === null && sb === null) return 0;
+        if (sa === null) return 1;
+        if (sb === null) return -1;
+        return sb - sa;
+      });
+      break;
+    }
+    case "disagreement":
+      games.sort((a, b) => compareByDiff(a, b, false)); // largest diff first
+      break;
+    case "value": {
+      games.sort((a, b) => {
+        const ba = bestValueBet(a);
+        const bb = bestValueBet(b);
+        if (ba === null && bb === null) return 0;
+        if (ba === null) return 1;
+        if (bb === null) return -1;
+        return bb.ev - ba.ev;
+      });
+      break;
+    }
+    case "hidden-edge":
+      games.sort((a, b) => hiddenEdgeScore(b) - hiddenEdgeScore(a));
+      break;
+    case "smart-value": {
+      games.sort((a, b) => {
+        const sa = smartValueScore(a);
+        const sb = smartValueScore(b);
+        if (sa === null && sb === null) return 0;
+        if (sa === null) return 1;
+        if (sb === null) return -1;
+        return sb - sa;
+      });
+      break;
+    }
+    case "combined": {
+      games.sort((a, b) => {
+        const ca = combinedProbability(a);
+        const cb = combinedProbability(b);
+        if (ca === null && cb === null) return 0;
+        if (ca === null) return 1;
+        if (cb === null) return -1;
+        return cb.confidence - ca.confidence;
+      });
+      break;
+    }
+    default:
+      games.sort((a, b) => (a.game_date || "").localeCompare(b.game_date || ""));
+  }
+  return games;
+}
+
+function renderGames() {
+  const gamesEl = document.getElementById("games");
+  gamesEl.innerHTML = sortedGames().map((g, i) => gameCardHTML(g, i)).join("");
+}
+
+const SORT_MODES = ["date", "confidence", "market-confidence", "agreement", "disagreement", "value", "hidden-edge", "smart-value", "combined"];
+
+function setSort(mode) {
+  currentSort = mode;
+  for (const m of SORT_MODES) {
+    document.getElementById("sort-btn-" + m).classList.toggle("active", mode === m);
+  }
+  document.getElementById("value-methodology").style.display = mode === "value" ? "block" : "none";
+  document.getElementById("hidden-edge-methodology").style.display = mode === "hidden-edge" ? "block" : "none";
+  document.getElementById("smart-value-methodology").style.display = mode === "smart-value" ? "block" : "none";
+  document.getElementById("combined-methodology").style.display = mode === "combined" ? "block" : "none";
+  renderGames();
+}
+
+async function init() {
+  const subtitle = document.getElementById("subtitle");
+  const errorSlot = document.getElementById("error-slot");
+  const disclaimerSlot = document.getElementById("disclaimer-slot");
+  const sortBar = document.getElementById("sort-bar");
+
+  let games;
+  try {
+    const res = await fetch(DATA_PATH, { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    games = await res.json();
+  } catch (err) {
+    subtitle.textContent = "";
+    errorSlot.innerHTML = `<div class="error-banner">
+      Could not load <code>${DATA_PATH}</code> (${err.message}).<br>
+      This page must be served over HTTP (not opened directly as a file://) for the fetch to work &mdash;
+      e.g. run <code>python -m http.server</code> from the project root and open
+      <code>http://localhost:8000/src/dashboard.html</code>.
+    </div>`;
+    return;
+  }
+
+  if (!Array.isArray(games) || games.length === 0) {
+    subtitle.textContent = "No games found in current_week_predictions.json.";
+    return;
+  }
+
+  allGames = games;
+
+  const week = games[0].week;
+  subtitle.textContent = `Week ${week ?? "?"} — ${games.length} game${games.length === 1 ? "" : "s"}`;
+
+  const allStartersZero = games.every(
+    g => (g.home_starters_out ?? 0) === 0 && (g.away_starters_out ?? 0) === 0
+  );
+  if (allStartersZero) {
+    disclaimerSlot.innerHTML = `<div class="disclaimer">
+      &#9888;&#65039; Injury data isn't available for this week yet (all teams show 0 starters out).
+      This does <b>not</b> mean nobody is injured &mdash; the underlying injury-report data simply hasn't
+      been published yet this far ahead of the games.
+    </div>`;
+  }
+
+  sortBar.style.display = "flex";
+  renderGames();
+}
+
+init();
+</script>
+</body>
+</html>

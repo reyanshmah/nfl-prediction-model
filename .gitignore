@@ -1,0 +1,11 @@
+venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Data file sizes were checked before writing this (see commit history/chat):
+# schedules.csv ~368K, games_with_features.csv ~520K, pass_rush_features.csv
+# ~772K (the largest), everything else in data/raw and data/processed is
+# smaller still -- total data footprint is ~2.8MB, well under any size
+# concern, so none of it is excluded here. Revisit this if a future data
+# file grows very large (tens of MB+).
