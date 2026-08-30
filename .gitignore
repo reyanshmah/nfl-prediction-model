@@ -3,6 +3,10 @@ __pycache__/
 *.pyc
 .ipynb_checkpoints/
 
+# Local Claude Code project config (dev-server launch settings) -- not
+# meant to be part of the public repo.
+.claude/
+
 # Data file sizes were checked before writing this (see commit history/chat):
 # schedules.csv ~368K, games_with_features.csv ~520K, pass_rush_features.csv
 # ~772K (the largest), everything else in data/raw and data/processed is
