@@ -7,9 +7,30 @@ __pycache__/
 # meant to be part of the public repo.
 .claude/
 
+# API keys/secrets -- never commit these. fetch_real_prop_odds.py reads its
+# SportsGameOdds key from here (see .env.example for the format).
+.env
+
+# Raw cached responses from the SportsGameOdds API -- large (each week's
+# response is several MB of every market on every game) and third-party
+# data we don't have redistribution rights to; data/processed/real_prop_odds_2025.csv
+# (the small extracted subset actually used) is the one that matters.
+data/raw/sgo_cache/
+
 # Data file sizes were checked before writing this (see commit history/chat):
 # schedules.csv ~368K, games_with_features.csv ~520K, pass_rush_features.csv
 # ~772K (the largest), everything else in data/raw and data/processed is
 # smaller still -- total data footprint is ~2.8MB, well under any size
 # concern, so none of it is excluded here. Revisit this if a future data
 # file grows very large (tens of MB+).
+
+# Runtime log from the daily scheduled task (run_predict_week.ps1) -- grows
+# forever, not meaningful version-controlled content.
+predict_week_log.txt
+
+# Ad-hoc backtest report dumps from mid-session exploration -- superseded by
+# later corrections in the same conversation (2021 data added, fair 3-season
+# training windows), so keeping them around would be stale/misleading rather
+# than a record worth having. The scripts that produced them are still
+# tracked in src/ and can regenerate current numbers any time.
+backtest_*.txt

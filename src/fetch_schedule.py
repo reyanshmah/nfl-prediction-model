@@ -9,7 +9,7 @@ from pathlib import Path
 import nfl_data_py as nfl
 import pandas as pd
 
-SEASONS = list(range(2022, 2026))  # 2022 through 2025
+SEASONS = list(range(2021, 2026))  # 2021 through 2025
 OUTPUT_PATH = Path(__file__).resolve().parent.parent / "data" / "raw" / "schedules.csv"
 
 

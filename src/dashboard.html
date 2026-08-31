@@ -139,6 +139,8 @@
   .pill .value { font-size: 0.95rem; font-weight: 700; margin-top: 2px; white-space: nowrap; }
   .pill.model .value { color: var(--accent); }
   .pill.market .value { color: var(--accent-2); }
+  .pill.bet .label { color: var(--good); }
+  .pill.bet .value { color: var(--good); }
   .chevron {
     color: var(--text-dim);
     transition: transform 0.15s ease;
@@ -281,68 +283,160 @@
     <button class="sort-btn" id="sort-btn-market-confidence" onclick="setSort('market-confidence')">Market Confidence</button>
     <button class="sort-btn" id="sort-btn-agreement" onclick="setSort('agreement')">Highest Agreement</button>
     <button class="sort-btn" id="sort-btn-disagreement" onclick="setSort('disagreement')">Highest Disagreement</button>
-    <button class="sort-btn" id="sort-btn-value" onclick="setSort('value')">Best Value (EV)</button>
-    <button class="sort-btn" id="sort-btn-hidden-edge" onclick="setSort('hidden-edge')">Hidden Edge</button>
-    <button class="sort-btn" id="sort-btn-smart-value" onclick="setSort('smart-value')">Smart Value</button>
-    <button class="sort-btn recommended" id="sort-btn-combined" onclick="setSort('combined')">Combined (Model+Market) &#9733;</button>
-  </div>
-  <div class="ou-methodology" id="value-methodology" style="display:none;">
-    "Highest Agreement" and "Best Value" answer different questions. Agreement tells you which game
-    both sources are confident about &mdash; but a game everyone loves has a terrible payout (a huge
-    favorite might be priced at &minus;900), so being right doesn't mean the bet is profitable. Value
-    is expected value per $1 staked: <code>EV = p &times; b &minus; (1 &minus; p)</code>, where
-    <code>p</code> is the model's own win probability for a side and <code>b</code> is that side's
-    real moneyline payout (e.g. +150 &rarr; b=1.5, &minus;175 &rarr; b=0.571). A positive EV means the
-    model thinks that side is MORE likely to win than the market's own price implies &mdash; an edge,
-    not just a likely outcome. This is a real bet on the model actually beating the market's pricing,
-    which earlier testing in this project found the market usually wins on average &mdash; treat this
-    as "where the model disagrees with the market's price," not a guarantee. Note this often surfaces
-    the SAME games as "Highest Disagreement," since a big model/market probability gap is what
-    produces a big EV number &mdash; see "Hidden Edge" for a more conservative alternative.
-  </div>
-  <div class="ou-methodology" id="hidden-edge-methodology" style="display:none;">
-    A more conservative kind of "value" than raw EV. Best Value (EV) often rewards games where the
-    model confidently overrides a market that ALSO has a strong opinion &mdash; and earlier testing in
-    this project found the market wins more often specifically in those high-disagreement spots (11 of
-    15 in one head-to-head check). Hidden Edge looks for something different: games where the
-    <b>market has no strong opinion</b> (close to a coin flip) but the <b>model is still confident</b>
-    on one side. That's the model adding information in a genuine toss-up, not claiming to know better
-    than a market that's already made up its mind &mdash; arguably the more trustworthy shape of edge,
-    even though it won't always be the highest raw EV number on the board.
-  </div>
-  <div class="ou-methodology" id="smart-value-methodology" style="display:none;">
-    Best Value (EV) and Hidden Edge each answer half the "would this bet be good" question on their
-    own: EV checks whether a bet is profitable at the price offered, but its biggest numbers mostly
-    come from the model fighting a market that's already confident &mdash; the exact spot this
-    project's own testing found the model loses more often. Hidden Edge avoids that trap but never
-    checks whether the bet is actually profitable at the odds given. Smart Value combines both by
-    <i>multiplying</i> them: <code>score = EV &times; (1 &minus; marketConfidence)</code> &mdash; EV
-    is the reasoning AND the profit measure at once, discounted by market confidence. See "Combined
-    (Model+Market)" for a different way of combining them, where the reasoning and the payout are
-    kept as two separate things instead of one multiplied score.
+    <button class="sort-btn" id="sort-btn-combined" onclick="setSort('combined')">Combined (Model+Market)</button>
+    <button class="sort-btn" id="sort-btn-best-bet" onclick="setSort('best-bet')">Best Bet</button>
+    <button class="sort-btn recommended" id="sort-btn-blowout-fade" onclick="setSort('blowout-fade')">Blowout Fade &#9733;</button>
+    <button class="sort-btn recommended" id="sort-btn-triple-combo" onclick="setSort('triple-combo')">Triple Combo &#9733;</button>
   </div>
   <div class="ou-methodology" id="combined-methodology" style="display:none;">
-    <b style="color:var(--good);">If you were actually going to bet on one of these games, this is
-    the sort to use.</b> The others above answer a betting-theory question (is this bet
-    mathematically +EV); this one answers a more direct question: given both the model's AND the
-    market's opinions together, how confident should you actually be, and what would you get back?
-    The model and market probabilities are blended into <b>one combined probability</b> &mdash; not
-    multiplied with the payout, just used as the reasoning &mdash; and the market's real moneyline is
-    shown separately afterward purely as payout info.
+    Blends the model and market into <b>one combined probability</b> &mdash; the market's real
+    moneyline is shown separately afterward purely as payout info, never multiplied in. The blend
+    weight is <i>dynamic</i>: the market's weight never drops below 50% (it's the generally sharper
+    source overall), rising toward 100% as the market gets more confident.
+    <code>modelWeight = 0.5 &times; (1 &minus; marketConfidence)</code>. Ranks purely by confidence,
+    with no regard for payout.
     <br><br>
-    The blend weight is <i>dynamic</i>, not fixed: the market's weight never drops below 50% (it's
-    the generally sharper source overall &mdash; about 2-3 points more accurate in this project's own
-    testing), rising toward 100% as the market gets more confident. The model only gets real influence
-    specifically when the market has no strong opinion. <code>modelWeight = 0.5 &times; (1 &minus;
-    marketConfidence)</code>. So market 50% / model 80% blends meaningfully toward the model (nothing
-    confident to defer to); market 80% / model 65% stays close to the market's own number (overriding
-    a confident market is the model's known weak spot).
+    <b style="color:var(--good);">Backtested +3.4% ROI in 2025, +2.7% ROI in 2024</b> (top 5 picks/week,
+    real held-out seasons, real odds) &mdash; positive both times, a real if modest edge. See "Triple
+    Combo" and "Blowout Fade" for the two results that backtested even better.
+  </div>
+  <div class="ou-methodology" id="best-bet-methodology" style="display:none;">
+    Combines probability and payout: always bets the side the combined model+market estimate
+    <i>actually favors</i> (win probability &ge; 50%), never the underdog just because a big payout
+    makes the raw EV math work out. Among those, ranks by expected value, discounted when the model
+    and market don't even agree on who wins.
+    <br><br>
+    <b style="color:var(--bad);">Backtested -12.2% ROI in 2025, +2.8% ROI in 2024</b> (top 5 picks/week,
+    real held-out seasons, real odds) &mdash; inconsistent between seasons, unlike Combined, Highest
+    Agreement, Blowout Fade, or Triple Combo, all of which stayed positive in both. Left on the
+    dashboard for reference, but it's no longer one of the sorts this project's own backtesting
+    actually supports betting from.
+  </div>
+  <div class="ou-methodology" id="blowout-fade-methodology" style="display:none;">
+    <b style="color:var(--good);">A different market than everything above &mdash; against the spread
+    (ATS), not moneyline.</b> Only applies to games where the market already has a big favorite
+    (<code>|market_spread| &ge; 7</code> points); every other game is excluded, not just ranked low.
+    Among those, bets the side the model's predicted margin disagrees with the spread on: if the model
+    thinks the favorite wins by less than the spread says (or the underdog wins outright), it bets the
+    <i>underdog</i> to cover; if the model thinks the favorite wins by even more than the spread says,
+    it bets the favorite to cover. Ranked by the size of that disagreement:
+    <code>edge = |model_margin &minus; market_spread|</code>, priced with the real spread odds
+    (<code>home_spread_odds</code> / <code>away_spread_odds</code>, usually near &minus;110).
+    <br><br>
+    <b>Backtested on real closing lines and real results, held out both times (never trained on),
+    each with a fair 3-season training window:</b> betting every qualifying game, no ranking needed
+    &mdash; <span style="color:var(--good); font-weight:600;">+8.8% ROI in 2025 (72 bets), +25.4% ROI
+    in 2024 (52 bets)</span>, both independently profitable &mdash; the single best result out of
+    every sort, combination, and pattern tested against this project's data. Note the 2025 number
+    specifically dropped a lot (was +19.5%) once 2021 data was added to fix incomplete rolling stats
+    for early-2022 games, a reminder that even a "survived two seasons" result can still move once the
+    underlying data improves.
+  </div>
+  <div class="ou-methodology" id="triple-combo-methodology" style="display:none;">
+    <b style="color:var(--good);">The best-performing moneyline sort found &mdash; better than
+    Combined, Highest Agreement, or any single sort on its own.</b> Only bets a game when THREE
+    separate signals all point the same way: Market Confidence, Highest Agreement (model and market
+    pick the same winner), and Hidden Edge (model confident while the market itself is unsure) all
+    have to agree &mdash; which, once the model and market already agree on who wins at all, happens
+    automatically. Among those games, ranks by the average of each signal's own z-score that week
+    (so a 0-1 probability and a raw edge number are on comparable footing before combining), and bets
+    the shared side at its real moneyline.
+    <br><br>
+    <b style="color:var(--good);">Backtested +8.3% ROI in 2025, +3.2% ROI in 2024</b> (top 5 picks/week,
+    real held-out seasons, real odds, fair 3-season training window both times) &mdash; positive in
+    both, and higher than every individual sort tested on its own.
   </div>
   <div id="games"></div>
 </div>
 
 <script>
 const DATA_PATH = "../data/processed/current_week_predictions.json";
+
+// Per-player historical game logs, fetched once at startup, used so "Most
+// Risky" reflects each player's OWN skew/consistency rather than a
+// position-wide constant that would pick the same direction for every
+// player at that position (e.g. every RB always showing "Under").
+const PLAYER_CSV = {
+  QB: { path: "../data/processed/qb_passing_features.csv", statCol: "passing_yards" },
+  RB: { path: "../data/processed/rb_rushing_features.csv", statCol: "rushing_yards" },
+  WR: { path: "../data/processed/wr_receiving_features.csv", statCol: "receiving_yards" },
+};
+const MIN_PLAYER_GAMES = 8; // below this, a personal percentile is too noisy to trust -- fall back to the position-wide number
+let PLAYER_HISTORY = {}; // { QB: { "Josh Allen": [yards, yards, ...], ... }, RB: {...}, WR: {...} }
+
+// Minimal CSV parser (handles quoted fields/embedded commas defensively,
+// even though this project's own CSVs don't actually need it).
+function parseCSV(text) {
+  const rows = [];
+  let row = [], field = "", inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (text[i + 1] === '"') { field += '"'; i++; } else { inQuotes = false; }
+      } else {
+        field += c;
+      }
+    } else if (c === '"') {
+      inQuotes = true;
+    } else if (c === ",") {
+      row.push(field); field = "";
+    } else if (c === "\n") {
+      row.push(field); rows.push(row); row = []; field = "";
+    } else if (c !== "\r") {
+      field += c;
+    }
+  }
+  if (field.length || row.length) { row.push(field); rows.push(row); }
+  return rows;
+}
+
+async function loadPlayerHistory() {
+  for (const pos of Object.keys(PLAYER_CSV)) {
+    const { path, statCol } = PLAYER_CSV[pos];
+    try {
+      const res = await fetch(path, { cache: "no-store" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const rows = parseCSV(await res.text());
+      const header = rows[0];
+      const nameIdx = header.indexOf("player_name");
+      const statIdx = header.indexOf(statCol);
+      const byPlayer = {};
+      for (let i = 1; i < rows.length; i++) {
+        const r = rows[i];
+        if (!r || r.length <= Math.max(nameIdx, statIdx)) continue;
+        const name = r[nameIdx];
+        const val = parseFloat(r[statIdx]);
+        if (!name || isNaN(val)) continue;
+        (byPlayer[name] || (byPlayer[name] = [])).push(val);
+      }
+      PLAYER_HISTORY[pos] = byPlayer;
+    } catch (err) {
+      console.warn(`Could not load per-player history for ${pos} (${path}): ${err.message}`);
+      PLAYER_HISTORY[pos] = {};
+    }
+  }
+}
+
+// Linear-interpolation percentile (matches numpy's default method).
+function percentile(sortedArr, p) {
+  const idx = (sortedArr.length - 1) * p;
+  const lo = Math.floor(idx), hi = Math.ceil(idx);
+  if (lo === hi) return sortedArr[lo];
+  return sortedArr[lo] + (sortedArr[hi] - sortedArr[lo]) * (idx - lo);
+}
+
+// This player's own gapLow/gapHigh at a given confidence, or null if they
+// don't have enough games on record for the percentiles to be trustworthy.
+function playerOwnGaps(posKey, playerName, confidence) {
+  const hist = PLAYER_HISTORY[posKey] && PLAYER_HISTORY[posKey][playerName];
+  if (!hist || hist.length < MIN_PLAYER_GAMES) return null;
+  const sorted = hist.slice().sort((a, b) => a - b);
+  const mean = sorted.reduce((a, b) => a + b, 0) / sorted.length;
+  const pLow = percentile(sorted, 1 - confidence);
+  const pHigh = percentile(sorted, confidence);
+  return { gapLow: mean - pLow, gapHigh: pHigh - mean, n: sorted.length };
+}
 
 // Over/under lines: predicted_yards adjusted by an empirically-derived gap
 // per position, NOT a plain standard-deviation/normal-distribution formula.
@@ -405,11 +499,35 @@ function tierLines(posKey, predictedYards, tierKey) {
 // gap at that tier wins, since a smaller gap means less distance pushed
 // from the raw prediction -- the more aggressive of the two, which is what
 // "most risky" is asking for. Ties (or a missing side) default to Over.
-function bestRiskyPick(posKey, predictedYards) {
-  const lines = tierLines(posKey, predictedYards, "mostRisky");
-  if (!lines) return null;
-  const side = lines.gapHigh < lines.gapLow ? "under" : "over";
-  return { side, value: side === "under" ? lines.under : lines.over };
+// Prefers THIS player's own historical gaps (so the pick can genuinely vary
+// player to player and isn't just repeating a position-wide constant);
+// falls back to the position-wide numbers only if the player doesn't have
+// enough games on record yet.
+function bestRiskyPick(posKey, predictedYards, playerName) {
+  if (typeof predictedYards !== "number") return null;
+
+  const confidence = OU_TIERS.mostRisky.confidence;
+  const own = playerName ? playerOwnGaps(posKey, playerName, confidence) : null;
+
+  let gapLow, gapHigh, source, n;
+  if (own) {
+    gapLow = Math.max(MIN_GAP, own.gapLow);
+    gapHigh = Math.max(MIN_GAP, own.gapHigh);
+    source = "player";
+    n = own.n;
+  } else {
+    const posGaps = OU_TIERS.mostRisky.gaps[posKey];
+    if (!posGaps) return null;
+    gapLow = Math.max(MIN_GAP, posGaps.gapLow);
+    gapHigh = Math.max(MIN_GAP, posGaps.gapHigh);
+    source = "position";
+    n = null;
+  }
+
+  const over = Math.max(0, Math.round((predictedYards - gapLow) * 2) / 2);
+  const under = Math.round((predictedYards + gapHigh) * 2) / 2;
+  const side = gapHigh < gapLow ? "under" : "over";
+  return { side, value: side === "under" ? under : over, source, n };
 }
 
 function pct(x) {
@@ -444,7 +562,7 @@ function playerLine(posLabel, posKey, player) {
 
   const safe = tierLines(posKey, predicted, "safe");
   const risky = tierLines(posKey, predicted, "risky");
-  const mostRisky = bestRiskyPick(posKey, predicted);
+  const mostRisky = bestRiskyPick(posKey, predicted, name);
 
   const safeHtml = safe
     ? `<div class="ou-line safe">Safe: Over <b>${safe.over}</b> &middot; Under <b>${safe.under}</b> <span class="ou-conf">(~80%)</span></div>`
@@ -452,8 +570,13 @@ function playerLine(posLabel, posKey, player) {
   const riskyHtml = risky
     ? `<div class="ou-line risky">Risky: Over <b>${risky.over}</b> &middot; Under <b>${risky.under}</b> <span class="ou-conf">(~65%)</span></div>`
     : "";
+  const mostRiskySourceNote = mostRisky
+    ? mostRisky.source === "player"
+      ? `personal history, n=${mostRisky.n}`
+      : `league avg, &lt;${MIN_PLAYER_GAMES} games on record`
+    : "";
   const mostRiskyHtml = mostRisky
-    ? `<div class="ou-line most-risky">Most Risky: <b>${mostRisky.side === "over" ? "Over" : "Under"} ${mostRisky.value}</b> <span class="ou-conf">(~55%)</span></div>`
+    ? `<div class="ou-line most-risky">Most Risky: <b>${mostRisky.side === "over" ? "Over" : "Under"} ${mostRisky.value}</b> <span class="ou-conf">(~55%, ${mostRiskySourceNote})</span></div>`
     : "";
 
   return `<div class="player-line">
@@ -575,31 +698,9 @@ function expectedValue(p, b) {
   return p * b - (1 - p);
 }
 
-// Best of the two possible bets on this game (home moneyline vs. away
-// moneyline), using the model's own win probability for each side. Returns
-// null if moneylines or the model probability aren't available.
-function bestValueBet(game) {
-  const p = game.model_win_prob;
-  const bHome = moneylineToPayout(game.home_moneyline);
-  const bAway = moneylineToPayout(game.away_moneyline);
-  if (p === null || p === undefined || isNaN(p) || bHome === null || bAway === null) return null;
-
-  const evHome = expectedValue(p, bHome);
-  const evAway = expectedValue(1 - p, bAway);
-  return evHome >= evAway
-    ? { side: "home", team: game.home_team, moneyline: game.home_moneyline, ev: evHome }
-    : { side: "away", team: game.away_team, moneyline: game.away_moneyline, ev: evAway };
-}
-
-// A different, more conservative notion of "value" than raw EV: games where
-// the MARKET has no strong opinion (near a coin flip) but the MODEL is
-// confident on one side -- the model adding information in a spot the
-// market hasn't committed to, rather than confidently overriding a market
-// that already has a strong view. That second case (high EV, low
-// agreement) is exactly where earlier testing in this project found the
-// market wins more often (11 of 15 in a head-to-head disagreement check),
-// so it's worth treating as a distinct, more trustworthy category, not
-// just a special case of EV.
+// Games where the MARKET has no strong opinion (near a coin flip) but the
+// MODEL is confident on one side -- used as one of the three signals in
+// "Triple Combo" below (no longer a standalone sort on its own).
 // Score = modelConfidence * (1 - marketConfidence): maximized when the
 // model is very sure AND the market is not, and pulled toward 0 if the
 // market is also confident (regardless of which side), even if the model's
@@ -609,25 +710,6 @@ function hiddenEdgeScore(game) {
   const kc = marketConfidence(game);
   if (mc < 0 || kc < 0) return -1;
   return mc * (1 - kc);
-}
-
-// The actual answer to "which sort should I bet from": raw EV rewards big
-// payouts, but the biggest EV numbers mostly come from the model
-// confidently overriding a market that's ALSO confident -- precisely the
-// situation this project's own testing showed the model loses more often
-// (11 of 15 in a head-to-head disagreement check). Hidden Edge avoids that
-// failure mode but never checks whether the bet is actually profitable at
-// the price offered. This combines both: real, positive EV, discounted by
-// how confident the market already is -- so a genuinely good bet in a
-// market that hasn't committed keeps its full value, while an EV number
-// that only exists because the model is fighting a confident market gets
-// shrunk down. Null propagates from bestValueBet (missing odds/probability).
-function smartValueScore(game) {
-  const best = bestValueBet(game);
-  if (best === null) return null;
-  const kc = marketConfidence(game);
-  if (kc < 0) return null;
-  return best.ev * (1 - kc);
 }
 
 // Model + market combined into ONE probability -- the "reasoning" -- with
@@ -661,6 +743,129 @@ function combinedProbability(game) {
   };
 }
 
+// How much to trust a Best Bet pick's raw EV. Full trust (1) when model and
+// market favor the SAME team -- the market corroborates the model, even if
+// only mildly, so the blended number stands as computed. Discounted when
+// they favor DIFFERENT teams: this project's own backtesting found that in
+// head-to-head model/market disagreements, the market's side won 11 of 15
+// (~73%) -- so a pick that only wins out because the combined blend
+// narrowly tips past 50%, propped up by a big underdog payout, is exactly
+// the situation that data says loses more often than it wins. The discount
+// is graduated, not a hard flip: a market barely leaning the other way
+// (near a coin flip, e.g. 48/52) barely counts as real disagreement and
+// keeps almost full trust; once the market's own lean passes ~10 points of
+// confidence (roughly 55/45 or beyond), trust hits zero and the pick
+// effectively drops out of contention rather than topping the list purely
+// because the payout math is large.
+function disagreementTrust(game) {
+  const m = game.model_win_prob;
+  const k = game.market_win_prob;
+  if (m === null || m === undefined || isNaN(m) || k === null || k === undefined || isNaN(k)) return 1;
+  const modelHome = m >= 0.5;
+  const marketHome = k >= 0.5;
+  if (modelHome === marketHome) return 1; // same side -- no penalty
+  const marketConf = marketConfidence(game); // 0 (coin flip) .. 1 (certain)
+  return Math.max(0, 1 - marketConf / 0.10);
+}
+
+// The actual answer to "give me the best bet to place": always bet the side
+// the combined (model+market) estimate actually favors -- NEVER flip to the
+// underdog just because a big payout makes the raw math work out, the way
+// Best Value (EV) and Smart Value both could. Among only-the-favored-side
+// bets, rank by trust-discounted EV so a real, likely winner with a fair
+// price beats one that's priced so short (e.g. -535) that it's not worth
+// the risk -- AND so a thin edge that only exists because the model is
+// overriding a market with a real lean the other way doesn't outrank a
+// smaller, cleaner edge just because its underdog payout is bigger.
+function bestBet(game) {
+  const c = combinedProbability(game);
+  if (c === null) return null;
+  const b = moneylineToPayout(c.moneyline);
+  if (b === null) return null;
+  const rawEv = expectedValue(c.confidence, b);
+  if (rawEv === null) return null;
+  return { team: c.team, moneyline: c.moneyline, winProb: c.confidence, ev: rawEv * disagreementTrust(game) };
+}
+
+// Against-the-spread (ATS), not moneyline -- see the "Blowout Fade"
+// methodology block for the full explanation. Only fires on games where the
+// market already has a big favorite; null (excluded, not ranked low)
+// otherwise.
+const BLOWOUT_SPREAD_THRESHOLD = 7;
+
+function blowoutFade(game) {
+  const mm = game.model_margin;
+  const spread = game.market_spread;
+  if (mm === null || mm === undefined || isNaN(mm) || spread === null || spread === undefined || isNaN(spread)) return null;
+  if (Math.abs(spread) < BLOWOUT_SPREAD_THRESHOLD) return null;
+  if (mm === spread) return null; // no edge either way
+
+  const side = mm > spread ? "home" : "away";
+  const team = side === "home" ? game.home_team : game.away_team;
+  const displaySpread = side === "home" ? -spread : spread; // this side's own ATS number
+  const odds = side === "home" ? game.home_spread_odds : game.away_spread_odds;
+  const b = moneylineToPayout(odds);
+  if (b === null) return null;
+
+  return {
+    team,
+    side,
+    displaySpread,
+    odds,
+    edge: Math.abs(mm - spread),
+    payout: b,
+  };
+}
+
+// The best-performing moneyline sort found: only bets a game where Market
+// Confidence, Highest Agreement, and Hidden Edge all point the same way --
+// which, once model and market already agree on the winner at all (i.e.
+// lockScore() is non-null), happens automatically, since Market Confidence
+// and Hidden Edge both always bet whichever side is already the agreed-upon
+// winner. Among those games, ranks by the average of each signal's own
+// z-score across the whole slate (so a 0-1 probability and a raw edge
+// product are on comparable footing before combining) rather than any one
+// metric's raw scale dominating.
+function tripleComboScores() {
+  const eligible = [];
+  const marketConfs = [];
+  const locks = [];
+  const edges = [];
+  for (const g of allGames) {
+    const lock = lockScore(g);
+    if (lock === null) continue;
+    const mc = marketConfidence(g);
+    const he = hiddenEdgeScore(g);
+    if (mc < 0 || he < 0) continue;
+    eligible.push(g);
+    marketConfs.push(mc);
+    locks.push(lock);
+    edges.push(he);
+  }
+  const zScore = (arr, x) => {
+    const mean = arr.reduce((a, b) => a + b, 0) / arr.length;
+    const variance = arr.reduce((a, b) => a + (b - mean) ** 2, 0) / arr.length;
+    const std = Math.sqrt(variance);
+    return std > 0 ? (x - mean) / std : 0;
+  };
+  const scores = new Map();
+  eligible.forEach((g, i) => {
+    const z = (zScore(marketConfs, marketConfs[i]) + zScore(locks, locks[i]) + zScore(edges, edges[i])) / 3;
+    scores.set(g, z);
+  });
+  return scores;
+}
+
+function tripleComboPick(game) {
+  const z = tripleComboScores().get(game);
+  if (z === undefined) return null;
+  const side = game.model_win_prob >= 0.5 ? "home" : "away"; // model and market already agree here
+  const team = side === "home" ? game.home_team : game.away_team;
+  const moneyline = side === "home" ? game.home_moneyline : game.away_moneyline;
+  if (moneyline === null || moneyline === undefined || isNaN(moneyline)) return null;
+  return { side, team, moneyline, score: z };
+}
+
 // The metadata badge shown on the collapsed row adapts to whatever sort is
 // active, so the ordering the user picked is visibly justified rather than
 // always showing the same (possibly unrelated) number.
@@ -683,32 +888,34 @@ function sortMetricBadge(game) {
     }
     case "disagreement":
       return diff !== null ? `Model/market differ by ${pct(diff)}` : null;
-    case "value": {
-      const best = bestValueBet(game);
-      if (best === null) return null;
-      const evPct = (best.ev * 100).toFixed(1);
-      const sign = best.ev >= 0 ? "+" : "";
-      return `Best bet: ${best.team} (${best.moneyline > 0 ? "+" : ""}${best.moneyline}) &mdash; model EV ${sign}${evPct}%`;
-    }
-    case "hidden-edge": {
-      const mc = modelConfidence(game);
-      const kc = marketConfidence(game);
-      if (mc < 0 || kc < 0) return null;
-      const team = game.model_win_prob >= 0.5 ? game.home_team : game.away_team;
-      return `Model likes ${team} (${pct(mc)} conf.) &mdash; market is only ${pct(kc)} sure`;
-    }
-    case "smart-value": {
-      const best = bestValueBet(game);
-      const score = smartValueScore(game);
-      if (best === null || score === null) return null;
-      const sign = score >= 0 ? "+" : "";
-      return `Best bet: ${best.team} (${best.moneyline > 0 ? "+" : ""}${best.moneyline}) &mdash; trust-weighted EV ${sign}${(score * 100).toFixed(1)}%`;
-    }
     case "combined": {
       const c = combinedProbability(game);
       if (c === null) return null;
       const mlStr = c.moneyline > 0 ? `+${c.moneyline}` : `${c.moneyline}`;
       return `${c.team} ${pct(c.confidence)} combined &mdash; payout at ${mlStr}`;
+    }
+    case "best-bet": {
+      const bet = bestBet(game);
+      if (bet === null) return null;
+      const mlStr = bet.moneyline > 0 ? `+${bet.moneyline}` : `${bet.moneyline}`;
+      const sign = bet.ev >= 0 ? "+" : "";
+      return `${bet.team} ${mlStr} &mdash; ${pct(bet.winProb)} to win, EV ${sign}${(bet.ev * 100).toFixed(1)}%`;
+    }
+    case "blowout-fade": {
+      const fade = blowoutFade(game);
+      if (fade === null) return null;
+      const spreadStr = fade.displaySpread > 0 ? `+${fade.displaySpread}` : `${fade.displaySpread}`;
+      const oddsStr = fade.odds > 0 ? `+${fade.odds}` : `${fade.odds}`;
+      const need = fade.displaySpread > 0
+        ? `needs to lose by &lt;${Math.abs(fade.displaySpread)} or win outright`
+        : `needs to win by &gt;${Math.abs(fade.displaySpread)}`;
+      return `${fade.team} ${spreadStr} (${oddsStr}) &mdash; ${need} &mdash; model/spread disagree by ${fade.edge.toFixed(1)} pts`;
+    }
+    case "triple-combo": {
+      const pick = tripleComboPick(game);
+      if (pick === null) return null;
+      const mlStr = pick.moneyline > 0 ? `+${pick.moneyline}` : `${pick.moneyline}`;
+      return `${pick.team} ${mlStr} &mdash; all 3 signals agree, combo score ${pick.score.toFixed(2)}`;
     }
     default:
       return null;
@@ -719,6 +926,48 @@ function gameCardHTML(game, idx) {
   const homeWin = game.model_win_prob;
   const marketWin = game.market_win_prob;
   const metricBadge = sortMetricBadge(game);
+
+  // Only in Best Bet mode: a dedicated pill spelling out which team to
+  // actually put money on, in plain American-odds notation, so it isn't
+  // buried in the small metadata text -- separate from the Model/Market
+  // pills, which show each source's own raw number and can disagree with
+  // each other (and with the actual recommended bet).
+  let betPillHTML = "";
+  if (currentSort === "best-bet") {
+    const bet = bestBet(game);
+    if (bet !== null) {
+      const mlStr = bet.moneyline > 0 ? `+${bet.moneyline}` : `${bet.moneyline}`;
+      betPillHTML = `
+        <div class="pill bet">
+          <span class="label">Bet</span>
+          <span class="value">${bet.team} ${mlStr}</span>
+        </div>`;
+    }
+  } else if (currentSort === "blowout-fade") {
+    const fade = blowoutFade(game);
+    if (fade !== null) {
+      const spreadStr = fade.displaySpread > 0 ? `+${fade.displaySpread}` : `${fade.displaySpread}`;
+      const need = fade.displaySpread > 0
+        ? `lose by &lt;${Math.abs(fade.displaySpread)} or win`
+        : `win by &gt;${Math.abs(fade.displaySpread)}`;
+      betPillHTML = `
+        <div class="pill bet">
+          <span class="label">Bet ATS</span>
+          <span class="value">${fade.team} ${spreadStr}</span>
+          <span class="label" style="margin-top:2px;">${fade.team} must ${need}</span>
+        </div>`;
+    }
+  } else if (currentSort === "triple-combo") {
+    const pick = tripleComboPick(game);
+    if (pick !== null) {
+      const mlStr = pick.moneyline > 0 ? `+${pick.moneyline}` : `${pick.moneyline}`;
+      betPillHTML = `
+        <div class="pill bet">
+          <span class="label">Bet</span>
+          <span class="value">${pick.team} ${mlStr}</span>
+        </div>`;
+    }
+  }
 
   const detail = `
     <div class="detail">
@@ -762,7 +1011,12 @@ function gameCardHTML(game, idx) {
           <span style="color:var(--good); font-weight:600;">Safe (~80%)</span> shows both sides;
           <span style="color:#f0b93a; font-weight:600;">Risky (~65%)</span> shows both sides, closer to the
           prediction; <span style="color:var(--bad); font-weight:600;">Most Risky (~55%)</span> shows only
-          whichever single side (over or under) has the smaller gap at that tier.
+          whichever single side (over or under) has the smaller gap at that tier &mdash; using
+          <b>this specific player's own game log</b> (fetched from the same CSVs the models were
+          trained on) rather than the position-wide number, so it can genuinely differ from one
+          player to the next instead of always picking the same direction for every player at a
+          position. Falls back to the position-wide gap only if a player has fewer than
+          8 games on record (shown as "league avg" on that line).
         </div>
         <div class="players-grid">
           <div class="team-col">
@@ -789,6 +1043,7 @@ function gameCardHTML(game, idx) {
           <div class="game-meta">${fmtDate(game.game_date)} &middot; Week ${game.week ?? ""}${metricBadge ? ` &middot; ${metricBadge}` : ""}</div>
         </div>
         <div class="prob-pair">
+          ${betPillHTML}
           <div class="pill model">
             <span class="label">Model</span>
             <span class="value">${favoredPill(game.home_team, game.away_team, homeWin)}</span>
@@ -850,31 +1105,6 @@ function sortedGames() {
     case "disagreement":
       games.sort((a, b) => compareByDiff(a, b, false)); // largest diff first
       break;
-    case "value": {
-      games.sort((a, b) => {
-        const ba = bestValueBet(a);
-        const bb = bestValueBet(b);
-        if (ba === null && bb === null) return 0;
-        if (ba === null) return 1;
-        if (bb === null) return -1;
-        return bb.ev - ba.ev;
-      });
-      break;
-    }
-    case "hidden-edge":
-      games.sort((a, b) => hiddenEdgeScore(b) - hiddenEdgeScore(a));
-      break;
-    case "smart-value": {
-      games.sort((a, b) => {
-        const sa = smartValueScore(a);
-        const sb = smartValueScore(b);
-        if (sa === null && sb === null) return 0;
-        if (sa === null) return 1;
-        if (sb === null) return -1;
-        return sb - sa;
-      });
-      break;
-    }
     case "combined": {
       games.sort((a, b) => {
         const ca = combinedProbability(a);
@@ -883,6 +1113,39 @@ function sortedGames() {
         if (ca === null) return 1;
         if (cb === null) return -1;
         return cb.confidence - ca.confidence;
+      });
+      break;
+    }
+    case "best-bet": {
+      games.sort((a, b) => {
+        const ba = bestBet(a);
+        const bb = bestBet(b);
+        if (ba === null && bb === null) return 0;
+        if (ba === null) return 1;
+        if (bb === null) return -1;
+        return bb.ev - ba.ev;
+      });
+      break;
+    }
+    case "blowout-fade": {
+      games.sort((a, b) => {
+        const fa = blowoutFade(a);
+        const fb = blowoutFade(b);
+        if (fa === null && fb === null) return 0;
+        if (fa === null) return 1; // games under the 7-point threshold sort last, not scored
+        if (fb === null) return -1;
+        return fb.edge - fa.edge;
+      });
+      break;
+    }
+    case "triple-combo": {
+      games.sort((a, b) => {
+        const pa = tripleComboPick(a);
+        const pb = tripleComboPick(b);
+        if (pa === null && pb === null) return 0;
+        if (pa === null) return 1;
+        if (pb === null) return -1;
+        return pb.score - pa.score;
       });
       break;
     }
@@ -897,17 +1160,17 @@ function renderGames() {
   gamesEl.innerHTML = sortedGames().map((g, i) => gameCardHTML(g, i)).join("");
 }
 
-const SORT_MODES = ["date", "confidence", "market-confidence", "agreement", "disagreement", "value", "hidden-edge", "smart-value", "combined"];
+const SORT_MODES = ["date", "confidence", "market-confidence", "agreement", "disagreement", "combined", "best-bet", "blowout-fade", "triple-combo"];
 
 function setSort(mode) {
   currentSort = mode;
   for (const m of SORT_MODES) {
     document.getElementById("sort-btn-" + m).classList.toggle("active", mode === m);
   }
-  document.getElementById("value-methodology").style.display = mode === "value" ? "block" : "none";
-  document.getElementById("hidden-edge-methodology").style.display = mode === "hidden-edge" ? "block" : "none";
-  document.getElementById("smart-value-methodology").style.display = mode === "smart-value" ? "block" : "none";
   document.getElementById("combined-methodology").style.display = mode === "combined" ? "block" : "none";
+  document.getElementById("best-bet-methodology").style.display = mode === "best-bet" ? "block" : "none";
+  document.getElementById("blowout-fade-methodology").style.display = mode === "blowout-fade" ? "block" : "none";
+  document.getElementById("triple-combo-methodology").style.display = mode === "triple-combo" ? "block" : "none";
   renderGames();
 }
 
@@ -919,7 +1182,10 @@ async function init() {
 
   let games;
   try {
-    const res = await fetch(DATA_PATH, { cache: "no-store" });
+    const [res] = await Promise.all([
+      fetch(DATA_PATH, { cache: "no-store" }),
+      loadPlayerHistory(), // per-player CSVs for Most Risky -- loaded in parallel, doesn't block on its own errors (falls back to position-wide per player)
+    ]);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     games = await res.json();
   } catch (err) {

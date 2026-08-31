@@ -86,7 +86,7 @@ RB_FEATURES_PATH = BASE_DIR / "data" / "processed" / "rb_rushing_features.csv"
 WR_FEATURES_PATH = BASE_DIR / "data" / "processed" / "wr_receiving_features.csv"
 OUTPUT_PATH = BASE_DIR / "data" / "processed" / "current_week_predictions.json"
 
-ALL_SEASONS = [2022, 2023, 2024, 2025]
+ALL_SEASONS = [2021, 2022, 2023, 2024, 2025]
 ROLLING_WINDOW = 5
 
 
@@ -503,6 +503,8 @@ def main() -> None:
         if pd.notna(home_moneyline) and pd.notna(away_moneyline):
             market_win_prob = float(win_mod.market_implied_home_prob(pd.DataFrame([game]))[0])
         market_spread = game.get("spread_line")
+        home_spread_odds = game.get("home_spread_odds")
+        away_spread_odds = game.get("away_spread_odds")
 
         record = {
             "home_team": home,
@@ -519,6 +521,11 @@ def main() -> None:
             # into the actual price a sportsbook is offering.
             "home_moneyline": float(home_moneyline) if pd.notna(home_moneyline) else None,
             "away_moneyline": float(away_moneyline) if pd.notna(away_moneyline) else None,
+            # Same idea for the spread market -- the real American odds
+            # priced on each side of the spread_line (usually near -110, but
+            # varies), needed for the Blowout Fade sort's real ATS payout.
+            "home_spread_odds": float(home_spread_odds) if pd.notna(home_spread_odds) else None,
+            "away_spread_odds": float(away_spread_odds) if pd.notna(away_spread_odds) else None,
             "home_starters_out": float(game["home_starters_out"]),
             "away_starters_out": float(game["away_starters_out"]),
             "home_qb": build_qb_prediction(home, qb_model, qb_cols, pass_def_ranks, game, "home", starters),
